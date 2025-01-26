@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ExpenseModule } from './expense/expense.module';
 import { UserModule } from './user/user.module';
 
+import { redisConfig } from './redis/redis.config';
+
 @Module({
   imports: [
     ExpenseModule,
@@ -22,7 +24,8 @@ import { UserModule } from './user/user.module';
       extra: {
         encrypt: true, // Required for Azure SQL
       },
-    }), UserModule,
+    }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

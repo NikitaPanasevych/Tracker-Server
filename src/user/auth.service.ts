@@ -2,12 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
 
   async registerUser(email: string, password: string) {
@@ -57,5 +59,12 @@ export class AuthService {
 
     // Return the token
     return { token };
+  }
+
+  async logout(token: string) {
+    const decoded = this.jwtService.decode(token);
+    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+
+    await this.redisService.set(`blacklist:${token}`, '1', ttl);
   }
 }

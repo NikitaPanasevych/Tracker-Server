@@ -6,9 +6,12 @@ import { User } from './user.entity';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from 'src/redis/redis.module';
+import { TokenBlacklistService } from './tokenBlacklist.service';
 
 @Module({
   imports: [
+    RedisModule,
     TypeOrmModule.forFeature([User]),
     ConfigModule.forRoot(),
     JwtModule.register({
@@ -20,6 +23,6 @@ import { ConfigModule } from '@nestjs/config';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, AuthService],
+  providers: [UserService, AuthService, TokenBlacklistService],
 })
 export class UserModule {}
