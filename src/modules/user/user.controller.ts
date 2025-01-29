@@ -9,12 +9,12 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtService } from '@nestjs/jwt';
-import { TokenBlacklistService } from './tokenBlacklist.service';
+import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
 
 @Controller('auth')
 export class UserController {

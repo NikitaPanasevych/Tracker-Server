@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { AuthService } from './auth.service';
+import { User } from './entities/user.entity';
+import { AuthService } from '../auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { RedisModule } from 'src/redis/redis.module';
-import { TokenBlacklistService } from './tokenBlacklist.service';
+import { RedisModule } from 'src/modules/redis/redis.module';
+import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
 
 @Module({
   imports: [
@@ -23,6 +23,6 @@ import { TokenBlacklistService } from './tokenBlacklist.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, AuthService, TokenBlacklistService],
+  providers: [UserService, TokenBlacklistService],
 })
 export class UserModule {}

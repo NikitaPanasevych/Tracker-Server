@@ -3,10 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { ExpenseModule } from './expense/expense.module';
-import { UserModule } from './user/user.module';
+import { ExpenseModule } from './modules/expense/expense.module';
+import { UserModule } from './modules/user/user.module';
 
-import { redisConfig } from './redis/redis.config';
+import { redisConfig } from './modules/redis/redis.config';
+import { AuthModule } from './modules/auth/auth.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { redisConfig } from './redis/redis.config';
       },
     }),
     UserModule,
+    AuthModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import { UserService } from './user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 
 describe('AuthService', () => {
