@@ -6,10 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ExpenseModule } from './modules/expense/expense.module';
 import { UserModule } from './modules/user/user.module';
 
-import { redisConfig } from './modules/redis/redis.config';
-import { AuthModule } from './modules/auth/auth.module';
-import { EmailModule } from './modules/email/email.module';
-
 @Module({
   imports: [
     ExpenseModule,
@@ -24,12 +20,13 @@ import { EmailModule } from './modules/email/email.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'], // Adjusted entity path
       synchronize: true, // Turn this off in production!
       extra: {
-        encrypt: true, // Required for Azure SQL
+        options: {
+          encrypt: true,
+          trustServerCertificate: true, // For development only
+        },
       },
     }),
     UserModule,
-    AuthModule,
-    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

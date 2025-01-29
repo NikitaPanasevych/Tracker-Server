@@ -13,7 +13,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
-    private emailService: EmailService,
+    private readonly emailService: EmailService,
   ) {}
 
   async registerUser(email: string, password: string) {
@@ -70,11 +70,17 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
+    // Check if email is verified
+    if (!user.isVerified) {
+      throw new BadRequestException(
+        'Email not verified. Please check your inbox for the verification link.',
+      );
+    }
+
     // Create a JWT payload and sign it
     const payload = { email: user.email, id: user.id };
     const token = await this.jwtService.signAsync(payload);
 
-    // Return the token
     return { token };
   }
 
@@ -110,11 +116,7 @@ export class AuthService {
 
     return {
       message: 'Email successfully verified',
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        isVerified: updatedUser.isVerified,
-      },
+      user: updatedUser,
     };
   }
 

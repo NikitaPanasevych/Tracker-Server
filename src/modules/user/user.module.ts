@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'src/modules/redis/redis.module';
 import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
+import { EmailService } from '../email/email.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, TokenBlacklistService],
+  providers: [UserService, TokenBlacklistService, AuthService, EmailService],
 })
 export class UserModule {}

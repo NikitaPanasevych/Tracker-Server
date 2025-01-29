@@ -2,7 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -15,6 +18,7 @@ import { User } from './entities/user.entity';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Controller('auth')
 export class UserController {
@@ -60,5 +64,22 @@ export class UserController {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers['authorization']?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    try {
+      return await this.AuthService.verifyEmail(token);
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'Email verification failed',
+      };
+    }
+  }
+
+  @Post('resend-verification')
+  async resendVerification(@Body() { email }: { email: string }) {
+    return this.AuthService.resendVerificationEmail(email);
   }
 }

@@ -1,22 +1,23 @@
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
+// user.entity.ts
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'nvarchar', length: 255, unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 255 })
   password: string;
 
-  @Column({ default: false })
+  @Column({ type: 'bit', default: false })
   isVerified: boolean;
 
-  @Column({ nullable: true })
-  verificationToken?: string | null;
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  verificationToken: string | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  verificationTokenExpires?: Date | null;
+  @Column({ type: 'datetime2', nullable: true })
+  verificationTokenExpires: Date | null;
 }
