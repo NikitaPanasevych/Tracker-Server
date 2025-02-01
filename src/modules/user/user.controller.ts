@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Query,
+  Redirect,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -18,7 +19,6 @@ import { User } from './entities/user.entity';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
-import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Controller('auth')
 export class UserController {
@@ -67,6 +67,7 @@ export class UserController {
   }
 
   @Get('verify-email')
+  @Redirect('http://localhost:5173/login', 301)
   async verifyEmail(@Query('token') token: string) {
     try {
       return await this.AuthService.verifyEmail(token);
