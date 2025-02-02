@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   Query,
   Redirect,
@@ -19,6 +20,7 @@ import { User } from './entities/user.entity';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { TokenBlacklistService } from '../auth/tokenBlacklist.service';
+import { ForgotPasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class UserController {
@@ -79,8 +81,23 @@ export class UserController {
     }
   }
 
-  @Post('resend-verification')
+  @Post('resend-confirmation')
   async resendVerification(@Body() { email }: { email: string }) {
     return this.AuthService.resendVerificationEmail(email);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() { email }: ForgotPasswordDto) {
+    return this.AuthService.sendPasswordResetEmail(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() { token, newPassword }: ResetPasswordDto) {
+    return this.AuthService.resetPassword(token, newPassword);
+  }
+
+  @Get('validate-reset-token/:token')
+  async validateResetToken(@Param('token') token: string) {
+    return this.AuthService.validateResetToken(token);
   }
 }

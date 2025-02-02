@@ -32,4 +32,18 @@ export class EmailService {
       `,
     });
   }
+
+  async sendPasswordResetEmail(email: string, resetUrl: string) {
+    await this.transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+        <h2>Password Reset</h2>
+        <p>Click this link to reset your password:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>This link will expire in 15 minutes.</p>
+      `,
+    });
+  }
 }

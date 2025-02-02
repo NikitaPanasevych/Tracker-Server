@@ -1,4 +1,3 @@
-// user.entity.ts
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -20,4 +19,10 @@ export class User {
 
   @Column({ type: 'datetime2', nullable: true })
   verificationTokenExpires: Date | null;
+
+  @Column({ type: 'nvarchar', length: 255, nullable: true })
+  resetPasswordToken: string | null;
+
+  @Column({ type: 'datetime2', nullable: true })
+  resetPasswordExpires: Date | null;
 }

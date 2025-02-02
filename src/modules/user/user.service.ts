@@ -1,33 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
-  registerUser(userData: Partial<User>): Promise<User> {
-    const user = this.repo.create(userData);
-    return this.repo.save(user);
+  async registerUser(userData: Partial<User>): Promise<User> {
+    const user = this.userRepository.create(userData);
+    return this.userRepository.save(user);
   }
 
-  async updateUser(id: number, updates: Partial<User>) {
-    await this.repo.update(id, updates);
-    return this.repo.findOneBy({ id });
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    await this.userRepository.update(id, updates);
+    const updatedUser = await this.userRepository.findOneBy({ id });
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return updatedUser;
   }
 
-  findByEmail(email: string) {
-    return this.repo.findOne({ where: { email } });
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'isVerified', 'verificationToken'],
+    });
   }
 
-  getAllUsers() {
-    return this.repo.find();
+  async findByResetToken(token: string) {
+    const users = await this.userRepository.find({
+      select: ['id', 'resetPasswordToken', 'resetPasswordExpires'],
+    });
+
+    for (const user of users) {
+      if (
+        user.resetPasswordToken &&
+        (await bcrypt.compare(token, user.resetPasswordToken))
+      ) {
+        return this.userRepository.findOneBy({ id: user.id });
+      }
+    }
+
+    return null;
   }
 
-  async findByVerificationToken(token: string) {
-    return this.repo.findOne({
+  async getAllUsers(): Promise<User[]> {
+    return this.userRepository.find({
+      select: ['id', 'email', 'isVerified'],
+    });
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.userRepository.findOne({
       where: { verificationToken: token },
+      select: ['id', 'email', 'verificationToken', 'verificationTokenExpires'],
+    });
+  }
+
+  async invalidateResetToken(userId: number) {
+    await this.userRepository.update(userId, {
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
     });
   }
 }

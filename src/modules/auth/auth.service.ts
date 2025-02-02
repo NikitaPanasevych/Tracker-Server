@@ -144,4 +144,52 @@ export class AuthService {
 
     return { message: 'Verification email resent successfully' };
   }
+
+  async sendPasswordResetEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) return; // Don't reveal if user exists
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 900000); // 15 minutes
+
+    await this.userService.updateUser(user.id, {
+      resetPasswordToken: await bcrypt.hash(token, 10),
+      resetPasswordExpires: expires,
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    await this.emailService.sendPasswordResetEmail(user.email, resetUrl);
+  }
+
+  async validateResetToken(token: string) {
+    const user = await this.userService.findByResetToken(token);
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
+      return { valid: false };
+    }
+    return { valid: true };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.userService.findByResetToken(token);
+
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.userService.updateUser(user.id, {
+      password: hashedPassword,
+    });
+
+    await this.userService.invalidateResetToken(user.id);
+  }
 }
